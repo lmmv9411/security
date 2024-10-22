@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/init.css" />
+    <script src="/js/users.js" defer></script>
+    <title>Crear Usuario</title>
+</head>
+
+<body>
+
+    <h1>Crear Usuario</h1>
+
+    <form class="d-flex flex-d-column w-fit-content gap-1" id="frmCreateUser" autocomplete="off">
+        <input type="text" name="username" id="username" placeholder="User Name" autocomplete="off">
+        <input type="text" name="name" id="name" placeholder="Name" autocomplete="off">
+        <input type="email" name="email" id="email" placeholder="Email" autocomplete="off">
+        <input type="password" name="password" id="password" placeholder="Password" autocomplete="off">
+        <select id="rol" name="rol">
+            <option value="1">ADMIN</option>
+            <option value="2">USER</option>
+        </select>
+        <button type="submit">Crear</button>
+    </form>
+
+</body>
+
+</html>
