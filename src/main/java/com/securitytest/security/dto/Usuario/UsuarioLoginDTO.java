@@ -1,4 +1,4 @@
-package com.securitytest.security.dto;
+package com.securitytest.security.dto.Usuario;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

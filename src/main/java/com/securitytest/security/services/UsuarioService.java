@@ -1,11 +1,11 @@
 package com.securitytest.security.services;
 
+import com.securitytest.security.dto.Usuario.UsuarioPatchDTO;
+import com.securitytest.security.exceptions.customs.BadRequestException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,8 +17,7 @@ import com.securitytest.security.models.Rol;
 import com.securitytest.security.models.Usuario;
 import com.securitytest.security.repositories.RolRepository;
 import com.securitytest.security.repositories.UsuarioRepository;
-
-import jakarta.validation.constraints.NotEmpty;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class UsuarioService {
@@ -72,39 +71,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public Usuario update(Usuario usuario, Long id) {
-        Optional<Usuario> usuarioOptional = usuarioRepository.findById(id);
-
-        if (usuarioOptional.isEmpty()) {
-            throw new NotFoundException("Usuario not found.");
-        }
-
-        Usuario usuarioDB = usuarioOptional.get();
-
-        usuarioDB.setName(usuario.getName());
-        usuarioDB.setEmail(usuario.getEmail());
-
-        final Set<Rol> roles = new HashSet<>();
-
-        usuario.getRoles().forEach(rol -> {
-
-            Optional<Rol> rolOptional = rolRepository.findById(rol.getId());
-
-            rolOptional.ifPresentOrElse(roles::add, () -> {
-                throw new NotFoundException("Rol no encontrado: " + rol.getId());
-            });
-
-        });
-
-        usuarioDB.setRoles(roles);
-
-        return usuarioRepository.save(usuarioDB);
-    }
-
-    @Transactional
-    @SuppressWarnings("unchecked")
-    public Usuario patch(@NotEmpty Map<String, Object> usuario, Long id) {
-
+    public Usuario patch(UsuarioPatchDTO usuarioPatch, Long id) {
         var optionalUsuario = usuarioRepository.findById(id);
 
         if (optionalUsuario.isEmpty()) {
@@ -113,37 +80,39 @@ public class UsuarioService {
 
         var usuarioDB = optionalUsuario.get();
 
-        usuario.forEach((filed, value) -> {
+        var count = new AtomicInteger();
 
-            switch (filed) {
-                case "email":
-                    usuarioDB.setEmail((String) value);
-                    break;
-                case "name":
-                    usuarioDB.setName((String) value);
-                    break;
-                case "roles":
-                    var list = (List<Object>) value;
+        Optional.ofNullable(usuarioPatch.getEmail())
+                .filter(email -> !email.isBlank())
+                .ifPresentOrElse(usuarioDB::setEmail, () -> count.incrementAndGet());
 
-                    var roles = list.stream()
-                            .map(item -> {
-                                var rol = (Map<String, Object>) item;
-                                return Rol
-                                        .builder()
-                                        .id((int) rol.get("id"))
-                                        .build();
-                            })
-                            .collect(Collectors.toSet());
+        Optional.ofNullable(usuarioPatch.getName())
+                .filter(name -> !name.isBlank())
+                .ifPresentOrElse(usuarioDB::setName, () -> count.incrementAndGet());
 
-                    usuarioDB.setRoles(roles);
-                    break;
-                default:
-                    throw new NotFoundException("Campo \'" + filed + "\' no encontrado.");
-            }
+        Optional.ofNullable(usuarioPatch.getUserName())
+                .filter(userName -> !userName.isBlank())
+                .ifPresentOrElse(usuarioDB::setUserName, () -> count.incrementAndGet());
 
-        });
+        Optional.ofNullable(usuarioPatch.getRoles())
+                .filter(roles -> !roles.isEmpty())
+                .ifPresentOrElse(usuarioDB::setRoles, () -> count.incrementAndGet());
+
+        if (count.get() == usuarioPatch.getClass().getDeclaredFields().length) {
+            throw new BadRequestException("No hay campos valido a actualizar!");
+        }
 
         return usuarioRepository.save(usuarioDB);
+
+    }
+
+    public Usuario finById(Long id) {
+        var optionalUsuario = usuarioRepository.findById(id);
+        if (optionalUsuario.isEmpty()) {
+            throw new NotFoundException("Usuario not found");
+        }
+
+        return optionalUsuario.get();
     }
 
 }

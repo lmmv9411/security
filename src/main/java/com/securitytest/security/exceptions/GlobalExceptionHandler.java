@@ -34,9 +34,12 @@ public class GlobalExceptionHandler {
 
         ex.getBindingResult()
                 .getAllErrors()
-                .forEach(error -> message.append(error.getDefaultMessage()).append(" "));
+                .forEach(error -> message.append(error.getDefaultMessage()).append("; "));
 
-        return createErrorResponse(message.toString().trim(), HttpStatus.BAD_REQUEST);
+        var msj = message.toString().trim();
+        msj = msj.substring(0, msj.length() - 1);
+
+        return createErrorResponse(msj, HttpStatus.BAD_REQUEST);
 
     }
 

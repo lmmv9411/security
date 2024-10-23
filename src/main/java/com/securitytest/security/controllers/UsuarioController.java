@@ -1,9 +1,8 @@
 package com.securitytest.security.controllers;
 
+import com.securitytest.security.dto.Usuario.UsuarioPatchDTO;
 import java.util.List;
-import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,33 +18,41 @@ import com.securitytest.security.models.Usuario;
 import com.securitytest.security.services.UsuarioService;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 
 @RestController
 @RequestMapping("/api/usuarios")
 @PreAuthorize("hasRole('ADMIN')")
 public class UsuarioController {
 
-    @Autowired
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     @GetMapping
     public List<Usuario> findAll() {
         return usuarioService.findAll();
     }
 
+    @GetMapping("{id}")
+    public Usuario finById(@PathVariable Long id) {
+        return usuarioService.finById(id);
+    }
+
     @PostMapping
     public ResponseEntity<Usuario> save(@Valid @RequestBody Usuario usuario) {
-        return new ResponseEntity<>(usuarioService.save(usuario), HttpStatus.CREATED);
+        return new ResponseEntity<>(
+                usuarioService.save(usuario),
+                HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> patch(
+    public Usuario patch(
             @PathVariable Long id,
-            @NotEmpty @RequestBody Map<String, Object> usuario) {
+            @RequestBody UsuarioPatchDTO usuario) {
 
-        Usuario usuarioPath = usuarioService.patch(usuario, id);
-        return ResponseEntity.ok(usuarioPath);
+        return usuarioService.patch(usuario, id);
     }
 
 }

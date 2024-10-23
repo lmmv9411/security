@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.securitytest.security.dto.UsuarioLoginDTO;
+import com.securitytest.security.dto.Usuario.UsuarioLoginDTO;
 import com.securitytest.security.exceptions.customs.BadRequestException;
 import com.securitytest.security.exceptions.customs.NotFoundException;
 import com.securitytest.security.models.Usuario;
