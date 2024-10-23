@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Table(name = "roles")
+@Builder
 public class Rol {
 
     @Id
@@ -27,6 +29,6 @@ public class Rol {
     private String nombre;
 
     @ManyToMany(mappedBy = "roles")
-    private List<Usuario> usuarios = new ArrayList<>();
+    private final List<Usuario> usuarios = new ArrayList<>();
 
 }

@@ -2,8 +2,10 @@ package com.securitytest.security.services;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +17,8 @@ import com.securitytest.security.models.Rol;
 import com.securitytest.security.models.Usuario;
 import com.securitytest.security.repositories.RolRepository;
 import com.securitytest.security.repositories.UsuarioRepository;
+
+import jakarta.validation.constraints.NotEmpty;
 
 @Service
 public class UsuarioService {
@@ -72,7 +76,7 @@ public class UsuarioService {
         Optional<Usuario> usuarioOptional = usuarioRepository.findById(id);
 
         if (usuarioOptional.isEmpty()) {
-            throw new NotFoundException("Usuario no encontrado!");
+            throw new NotFoundException("Usuario not found.");
         }
 
         Usuario usuarioDB = usuarioOptional.get();
@@ -93,6 +97,51 @@ public class UsuarioService {
         });
 
         usuarioDB.setRoles(roles);
+
+        return usuarioRepository.save(usuarioDB);
+    }
+
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public Usuario patch(@NotEmpty Map<String, Object> usuario, Long id) {
+
+        var optionalUsuario = usuarioRepository.findById(id);
+
+        if (optionalUsuario.isEmpty()) {
+            throw new NotFoundException("Usuario not found.");
+        }
+
+        var usuarioDB = optionalUsuario.get();
+
+        usuario.forEach((filed, value) -> {
+
+            switch (filed) {
+                case "email":
+                    usuarioDB.setEmail((String) value);
+                    break;
+                case "name":
+                    usuarioDB.setName((String) value);
+                    break;
+                case "roles":
+                    var list = (List<Object>) value;
+
+                    var roles = list.stream()
+                            .map(item -> {
+                                var rol = (Map<String, Object>) item;
+                                return Rol
+                                        .builder()
+                                        .id((int) rol.get("id"))
+                                        .build();
+                            })
+                            .collect(Collectors.toSet());
+
+                    usuarioDB.setRoles(roles);
+                    break;
+                default:
+                    throw new NotFoundException("Campo \'" + filed + "\' no encontrado.");
+            }
+
+        });
 
         return usuarioRepository.save(usuarioDB);
     }

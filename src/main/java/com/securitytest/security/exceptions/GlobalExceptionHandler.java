@@ -19,6 +19,13 @@ import com.securitytest.security.exceptions.customs.NotFoundException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
+
+        return createErrorResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(
             MethodArgumentNotValidException ex) {
