@@ -84,19 +84,19 @@ public class UsuarioService {
 
         Optional.ofNullable(usuarioPatch.getEmail())
                 .filter(email -> !email.isBlank())
-                .ifPresentOrElse(usuarioDB::setEmail, () -> count.incrementAndGet());
+                .ifPresentOrElse(usuarioDB::setEmail, count::incrementAndGet);
 
         Optional.ofNullable(usuarioPatch.getName())
                 .filter(name -> !name.isBlank())
-                .ifPresentOrElse(usuarioDB::setName, () -> count.incrementAndGet());
+                .ifPresentOrElse(usuarioDB::setName, count::incrementAndGet);
 
         Optional.ofNullable(usuarioPatch.getUserName())
                 .filter(userName -> !userName.isBlank())
-                .ifPresentOrElse(usuarioDB::setUserName, () -> count.incrementAndGet());
+                .ifPresentOrElse(usuarioDB::setUserName, count::incrementAndGet);
 
         Optional.ofNullable(usuarioPatch.getRoles())
                 .filter(roles -> !roles.isEmpty())
-                .ifPresentOrElse(usuarioDB::setRoles, () -> count.incrementAndGet());
+                .ifPresentOrElse(usuarioDB::setRoles, count::incrementAndGet);
 
         if (count.get() == usuarioPatch.getClass().getDeclaredFields().length) {
             throw new BadRequestException("No hay campos valido a actualizar!");
