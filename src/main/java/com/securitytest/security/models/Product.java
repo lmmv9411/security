@@ -30,4 +30,7 @@ public class Product {
 
     private double price;
 
+    @Enumerated(EnumType.STRING)
+    private TypeMove typeMove;
+
 }

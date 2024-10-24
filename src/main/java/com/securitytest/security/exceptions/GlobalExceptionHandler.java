@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
-
         return createErrorResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException ex) {
+        StringBuilder message = new StringBuilder();
+        ex.getConstraintViolations().forEach(violation -> {
+            message.append(violation.getPropertyPath().toString())
+                    .append(" ")
+                    .append(violation.getMessage())
+                    .append("; ");
+        });
+
+        String msj = message.toString().trim();
+        if (msj.endsWith(";")) {
+            msj = msj.substring(0, msj.length() - 1);
+        }
+
+        return createErrorResponse(msj, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -37,7 +54,9 @@ public class GlobalExceptionHandler {
                 .forEach(error -> message.append(error.getDefaultMessage()).append("; "));
 
         var msj = message.toString().trim();
-        msj = msj.substring(0, msj.length() - 1);
+        if (msj.endsWith(";")) {
+            msj = msj.substring(0, msj.length() - 1);
+        }
 
         return createErrorResponse(msj, HttpStatus.BAD_REQUEST);
 
