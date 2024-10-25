@@ -5,6 +5,8 @@ import java.time.Duration;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,7 +35,7 @@ public class LoginController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/login")
-    public void login(
+    public ResponseEntity<?> login(
             @Valid @RequestBody UsuarioLoginDTO usuario,
             HttpServletResponse response) throws IOException {
 
@@ -61,7 +63,7 @@ public class LoginController {
 
         response.addCookie(cookieSesion);
 
-        response.sendRedirect("/");
+        return new ResponseEntity<>(HttpStatus.CREATED);
 
     }
 
@@ -69,7 +71,7 @@ public class LoginController {
     public void logout(HttpServletResponse response) throws IOException {
 
         Cookie cookieSesion = new Cookie("sesion", null);
-                
+
         cookieSesion.setMaxAge(0);
         cookieSesion.setPath("/");
 

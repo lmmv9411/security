@@ -35,19 +35,22 @@ public class ProductService {
 
     @Transactional
     public void increaseStock(Long id, int q) {
+
         var optionalProduct = productRepository.findById(id);
+
         optionalProduct.ifPresentOrElse((p) -> {
             productRepository.increaseStock(p.getId(), q, TypeMove.ENTRY);
         }, () -> {
             throw new NotFoundException("Product not found.");
         });
+
     }
 
     @Transactional
     public void decreaseStock(Long id, int q) {
         var optionalProduct = productRepository.findById(id);
         optionalProduct.ifPresentOrElse((p) -> {
-            productRepository.decreaseStock(p.getId(), q, TypeMove.ENTRY);
+            productRepository.decreaseStock(p.getId(), q, TypeMove.EXIT);
         }, () -> {
             throw new NotFoundException("Product not found.");
         });

@@ -1,23 +1,23 @@
 package com.securitytest.security.services;
 
-import com.securitytest.security.dto.Usuario.UsuarioPatchDTO;
-import com.securitytest.security.exceptions.customs.BadRequestException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.securitytest.security.dto.Usuario.UsuarioPatchDTO;
+import com.securitytest.security.exceptions.customs.BadRequestException;
 import com.securitytest.security.exceptions.customs.NotFoundException;
 import com.securitytest.security.models.Rol;
 import com.securitytest.security.models.Usuario;
 import com.securitytest.security.repositories.RolRepository;
 import com.securitytest.security.repositories.UsuarioRepository;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class UsuarioService {
@@ -96,7 +96,14 @@ public class UsuarioService {
 
         Optional.ofNullable(usuarioPatch.getRoles())
                 .filter(roles -> !roles.isEmpty())
-                .ifPresentOrElse(usuarioDB::setRoles, count::incrementAndGet);
+                .ifPresentOrElse((roles) -> {
+                    roles.forEach(rol -> {
+                        if (rolRepository.findById(rol.getId()).isEmpty()) {
+                            throw new NotFoundException("Rol no encontrado: " + rol.getId());
+                        }
+                    });
+                    usuarioDB.setRoles(roles);
+                }, count::incrementAndGet);
 
         if (count.get() == usuarioPatch.getClass().getDeclaredFields().length) {
             throw new BadRequestException("No hay campos valido a actualizar!");

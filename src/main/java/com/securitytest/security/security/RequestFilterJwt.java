@@ -75,7 +75,7 @@ public class RequestFilterJwt extends OncePerRequestFilter {
         usuario.setUserName(userName);
 
         List<SimpleGrantedAuthority> authorities = roles.stream()
-                .map(rol -> new SimpleGrantedAuthority(rol)).toList();
+                .map(SimpleGrantedAuthority::new).toList();
 
         var authentication = new UsernamePasswordAuthenticationToken(usuario, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
