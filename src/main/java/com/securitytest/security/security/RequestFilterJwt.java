@@ -1,6 +1,7 @@
 package com.securitytest.security.security;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.securitytest.security.models.Usuario;
 import com.securitytest.security.security.util.JwtUtil;
 
@@ -28,7 +30,7 @@ public class RequestFilterJwt extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
-    private final List<String> listUrls = List.of("/login", "/api/auth/", "/favicon.ico", "/js/", "/css/");
+    private final List<String> listUrls = List.of("/Test", "/login", "/api/auth/", "/favicon.ico", "/js/", "/css/");
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
@@ -43,26 +45,16 @@ public class RequestFilterJwt extends OncePerRequestFilter {
 
         var cookieSesion = WebUtils.getCookie(request, "sesion");
 
-        if (cookieSesion == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            filterChain.doFilter(request, response);
+        if (cookieSesion == null || cookieSesion.getValue().isBlank()) {
+            redirect(request, response, "Sin Autorización");
             return;
         }
 
-        var tokenSesion = cookieSesion.getValue();
-
-        if (tokenSesion.isBlank()) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        var decodedJwt = jwtUtil.validateToken(tokenSesion);
+        var decodedJwt = jwtUtil.validateToken(cookieSesion.getValue());
 
         if (decodedJwt == null || decodedJwt.getExpiresAt().before(new Date())) {
             removeCookie(response);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            filterChain.doFilter(request, response);
+            redirect(request, response, "Reiniciar Sesión.");
             return;
         }
 
@@ -88,6 +80,31 @@ public class RequestFilterJwt extends OncePerRequestFilter {
         cookieSesion.setMaxAge(0);
         cookieSesion.setPath("/");
         response.addCookie(cookieSesion);
+    }
+
+    private void redirect(HttpServletRequest request, HttpServletResponse response, String message)
+            throws IOException, ServletException {
+
+        var method = request.getMethod();
+
+        var isApiRequest = method.equals("GET") || method.equals("HEAD");
+
+        response.setCharacterEncoding("UTF-8");
+
+        if (!isApiRequest) {
+            final var mapper = new ObjectMapper();
+            final var error = mapper.createObjectNode();
+            error.put("code", HttpServletResponse.SC_UNAUTHORIZED);
+            error.put("message", message);
+            error.put("timestamp", LocalDateTime.now().toString());
+            error.put("path", request.getRequestURI());
+            error.put("method", request.getMethod());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            mapper.writer().writeValue(response.getWriter(), error);
+        } else {
+            response.sendRedirect("/login");
+        }
     }
 
 }

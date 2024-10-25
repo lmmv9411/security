@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <h1>Pruebas</h1>
+
+    <button id="btnTest">Test</button>
+
+    <script>
+        async function test() {
+            try {
+                const resp = await fetch('http://localhost:8080/api/products/1/increase-stock?q=3', {
+                    method: 'PATCH',
+                    redirect: "follow"
+                });
+                console.log(resp.status)
+                const msgErr = await resp.json();
+                console.log(msgErr)
+            } catch (err) {
+                console.error(err)
+            }
+        }
+
+        btnTest.addEventListener('click', test);
+
+    </script>
+
+</body>
+
+</html>
