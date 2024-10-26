@@ -1,6 +1,5 @@
 package com.securitytest.security.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -19,7 +18,7 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     public SecurityConfig(RequestFilterJwt filtro,
-                          CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+            CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
         this.filtro = filtro;
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }

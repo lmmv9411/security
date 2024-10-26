@@ -1,7 +1,6 @@
 package com.securitytest.security.security;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.securitytest.security.models.Usuario;
 import com.securitytest.security.security.util.JwtUtil;
 
