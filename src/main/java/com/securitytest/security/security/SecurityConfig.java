@@ -14,8 +14,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private RequestFilterJwt filtro;
+    private final RequestFilterJwt filtro;
+
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    public SecurityConfig(RequestFilterJwt filtro,
+                          CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+        this.filtro = filtro;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -23,14 +30,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/login").permitAll()
                         .requestMatchers("/Test.html").permitAll()
                         .requestMatchers("/favicon.ico").permitAll()
                         .requestMatchers("/js/**").permitAll()
                         .requestMatchers("/css/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(filtro, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(f -> f.loginPage("/login"))
+                .formLogin(f -> f.loginPage("/login").permitAll())
+                .exceptionHandling(exc -> exc.authenticationEntryPoint(customAuthenticationEntryPoint))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }

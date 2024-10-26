@@ -24,8 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Table(name = "usuarios", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "email", "userName" }) })
+@Table(name = "usuarios", uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "userName"})})
 @JsonIgnoreProperties(value = "password", allowGetters = false, allowSetters = true)
 public class Usuario {
 
