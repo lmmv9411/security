@@ -28,7 +28,7 @@ public class RequestFilterJwt extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
-    private final List<String> listUrls = List.of("/Test", "/login", "/api/auth/", "/favicon.ico", "/js/", "/css/");
+    private final List<String> listUrls = List.of("/login", "/api/auth/", "/favicon.ico", "/js/", "/css/");
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
