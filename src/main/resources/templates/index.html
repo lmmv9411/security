@@ -2,37 +2,39 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="/css/init.css">
-  <script src="/js/init.js" defer></script>
-  <title>Inicio</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="/css/init.css">
+    <script src="/js/init.js" defer></script>
+    <title>Inicio</title>
 </head>
 
 <body>
-  <h1>Bienvenido</h1>
-  <span th:text="|Usuario: ${username}|"></span>
-  <span th:text="|Nombre: ${name}|"></span>
-  <span th:text="|Roles: ${roles}|"></span>
-  <a href="/api/auth/logout">Cerrar Sesión</a>
-  <a href="/users.html">Crear Usuario</a>
-  </h1>
 
-  <button type="button" id="btnCargar">Cargar Usuarios</button>
+<h1 class="padding-1">Bienvenido</h1>
+<div class="padding-1 d-flex flex-d-column gap-1">
+    <span th:text="|Usuario: ${username}|"></span>
+    <span th:text="|Nombre: ${name}|"></span>
+    <span th:text="|Roles: ${roles}|"></span>
+    <a href="/api/auth/logout">Cerrar Sesión</a>
+    <a href="/users.html">Crear Usuario</a>
+</div>
 
-  <div class="container">
+<button type="button" id="btnCargar">Cargar Usuarios</button>
+
+<div class="container">
     <table>
-      <thead>
+        <thead>
         <th>Id</th>
         <th>UserName</th>
         <th>Name</th>
         <th>Email</th>
         <th>Roles</th>
-      </thead>
-      <tbody id="bodyTbl">
-      </tbody>
+        </thead>
+        <tbody id="bodyTbl">
+        </tbody>
     </table>
-  </div>
+</div>
 
 
 </body>

@@ -1,4 +1,13 @@
 package com.securitytest.security.dto.Product;
 
-public class ProductPatch {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class ProductPatchDTO {
+    private String description;
+    private Double price;
 }

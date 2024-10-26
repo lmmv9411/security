@@ -72,13 +72,8 @@ public class UsuarioService {
 
     @Transactional
     public Usuario patch(UsuarioPatchDTO usuarioPatch, Long id) {
-        var optionalUsuario = usuarioRepository.findById(id);
 
-        if (optionalUsuario.isEmpty()) {
-            throw new NotFoundException("Usuario not found.");
-        }
-
-        var usuarioDB = optionalUsuario.get();
+        var usuarioDB = finById(id);
 
         var count = new AtomicInteger();
 
@@ -114,7 +109,9 @@ public class UsuarioService {
     }
 
     public Usuario finById(Long id) {
+
         var optionalUsuario = usuarioRepository.findById(id);
+
         if (optionalUsuario.isEmpty()) {
             throw new NotFoundException("Usuario not found");
         }

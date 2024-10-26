@@ -27,14 +27,14 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((requests) -> requests
+                .authorizeHttpRequests(req -> req
+                        .requestMatchers("/login").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/favicon.ico").permitAll()
                         .requestMatchers("/js/**").permitAll()
                         .requestMatchers("/css/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(filtro, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(f -> f.loginPage("/login").permitAll())
                 .exceptionHandling(exc -> exc.authenticationEntryPoint(customAuthenticationEntryPoint))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();

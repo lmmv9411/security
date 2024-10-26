@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.securitytest.security.models.Usuario;
 import com.securitytest.security.security.util.JwtUtil;
 
@@ -28,7 +29,8 @@ public class RequestFilterJwt extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
-    private final List<String> listUrls = List.of("/login", "/api/auth/", "/favicon.ico", "/js/", "/css/");
+    private final List<String> listUrls = List.of(
+            "/login", "/api/auth/", "/favicon.ico", "/js/", "/css/");
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
@@ -50,12 +52,18 @@ public class RequestFilterJwt extends OncePerRequestFilter {
 
         var decodedJwt = jwtUtil.validateToken(cookieSesion.getValue());
 
-        if (decodedJwt == null || decodedJwt.getExpiresAt().before(new Date())) {
+        if (decodedJwt.isEmpty() || decodedJwt.get().getExpiresAt().before(new Date())) {
             removeCookie(response);
             filterChain.doFilter(request, response);
             return;
         }
 
+        setAuthentication(decodedJwt.get());
+
+        filterChain.doFilter(request, response);
+    }
+
+    private void setAuthentication(DecodedJWT decodedJwt) {
         String userName = decodedJwt.getSubject();
         String name = decodedJwt.getClaim("name").asString();
         List<String> roles = decodedJwt.getClaim("roles").asList(String.class);
@@ -69,8 +77,6 @@ public class RequestFilterJwt extends OncePerRequestFilter {
 
         var authentication = new UsernamePasswordAuthenticationToken(usuario, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        filterChain.doFilter(request, response);
     }
 
     private void removeCookie(HttpServletResponse response) {

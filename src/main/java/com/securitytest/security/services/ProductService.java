@@ -1,5 +1,7 @@
 package com.securitytest.security.services;
 
+import com.securitytest.security.dto.Product.ProductPatchDTO;
+import com.securitytest.security.exceptions.customs.BadRequestException;
 import com.securitytest.security.exceptions.customs.NotFoundException;
 import com.securitytest.security.models.Product;
 import com.securitytest.security.models.TypeMove;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class ProductService {
@@ -54,5 +58,37 @@ public class ProductService {
         }, () -> {
             throw new NotFoundException("Product not found.");
         });
+    }
+
+    public Product findById(Long id) {
+        var optionalProduct = productRepository.findById(id);
+
+        if (optionalProduct.isEmpty()) {
+            throw new NotFoundException("Product not found: " + id);
+        }
+        return optionalProduct.get();
+    }
+
+    @Transactional
+    public Product update(Long id, ProductPatchDTO productPatch) {
+
+        var product = findById(id);
+
+        var count = new AtomicInteger();
+
+        Optional.ofNullable(productPatch.getDescription())
+                .filter(description -> !description.isBlank())
+                .ifPresentOrElse(product::setDescription, count::incrementAndGet);
+
+        Optional.ofNullable(productPatch.getPrice())
+                .filter(price -> price > 0)
+                .ifPresentOrElse(product::setPrice, count::incrementAndGet);
+
+        if (count.get() == productPatch.getClass().getDeclaredFields().length) {
+            throw new BadRequestException("No hay campos validos a actualizar!.");
+        }
+
+        return productRepository.save(product);
+
     }
 }

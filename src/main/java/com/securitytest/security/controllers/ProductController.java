@@ -1,5 +1,6 @@
 package com.securitytest.security.controllers;
 
+import com.securitytest.security.dto.Product.ProductPatchDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +51,16 @@ public class ProductController {
     public ResponseEntity<?> decreaseStock(@PathVariable Long id, @RequestParam @Min(1) int q) {
         productService.decreaseStock(id, q);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}")
+    public Product findById(@PathVariable Long id) {
+        return productService.findById(id);
+    }
+
+    @PatchMapping("/{id}")
+    public Product update(@PathVariable Long id, @RequestBody ProductPatchDTO product) {
+        return productService.update(id, product);
     }
 
 }
