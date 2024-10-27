@@ -3,6 +3,7 @@ package com.securitytest.security.security.util;
 import java.util.Date;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
@@ -14,7 +15,8 @@ import com.securitytest.security.models.Usuario;
 @Component
 public class JwtUtil {
 
-    private final String SECRET_KEY = "jesus_es_mi_pastor_nada_me_faltara";
+    @Value("${security.variable.password}")
+    private String SECRET_KEY;
     private final long expiration_time = System.currentTimeMillis() + (1000 * 60 * 60); // 1 hora
 
     public String generateToken(Usuario usuario) {

@@ -1,0 +1,7 @@
+{"properties": [
+  {
+    "name": "security.variable.password",
+    "type": "java.lang.String",
+    "description": "password for jwt"
+  }
+]}
